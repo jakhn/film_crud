@@ -34,17 +34,21 @@ func (f *userRepo) Create(ctx context.Context, user *models.CreateUser) (string,
 			user_id,
 			first_name, 
 			last_name,
+			login,
+			password,
 			phone_number,
 			balance,
 			created_at,
 			updated_at
-		) VALUES ( $1, $2 , $3, $4, $5,nowa(), now())
+		) VALUES ( $1, $2 , $3, $4, $5, &6, $7, now(), now())
 	`
 
 	_, err := f.db.Exec(ctx, query,
 		id,
 		user.FirstName,
 		user.LastName,
+		user.Login,
+		user.Password,
 		user.PhoneNumber,
 		user.Balance,
 	)
@@ -62,8 +66,10 @@ func (f *userRepo) GetByPKey(ctx context.Context, pkey *models.UserPrimarKey) (*
 		id        		sql.NullString
 		firstName 		sql.NullString
 		lastName 		sql.NullString
+		login			sql.NullString
+		password		sql.NullString
 		phoneNumber 	sql.NullString
-		balance 		sql.NullString
+		balance 		sql.NullInt64
 		createdAt 		sql.NullString
 		updatedAt 		sql.NullString
 	)
@@ -73,6 +79,8 @@ func (f *userRepo) GetByPKey(ctx context.Context, pkey *models.UserPrimarKey) (*
 			user_id,
 			first_name, 
 			last_name,
+			login,
+			password,
 			phone_number,
 			balance,
 			created_at,
@@ -87,8 +95,12 @@ func (f *userRepo) GetByPKey(ctx context.Context, pkey *models.UserPrimarKey) (*
 			&id,
 			&firstName,
 			&lastName,
+			&login,
+			&password,
 			&phoneNumber,
 			&balance, 
+			&createdAt,
+			&updatedAt,
 		)
 
 	if err != nil {
@@ -99,8 +111,10 @@ func (f *userRepo) GetByPKey(ctx context.Context, pkey *models.UserPrimarKey) (*
 		Id: 		 id.String,
 		FirstName:   firstName.String,
 		LastName: 	 lastName.String,
+		Login: 		 login.String,
+		Password: 	 password.String,		
 		PhoneNumber: phoneNumber.String,
-		Balance: 	 balance.String,
+		Balance: 	 balance.Int64,
 		CreatedAt: 	 createdAt.String,
 		UpdatedAt:   updatedAt.String,
 	}, nil
@@ -128,6 +142,8 @@ func (f *userRepo) GetList(ctx context.Context, req *models.GetListUserRequest) 
 			user_id,
 			first_name, 
 			last_name,
+			login,
+			password,
 			phone_number,
 			balance,
 			created_at,
@@ -146,8 +162,10 @@ func (f *userRepo) GetList(ctx context.Context, req *models.GetListUserRequest) 
 			id        		sql.NullString
 			firstName 		sql.NullString
 			lastName 		sql.NullString
+			login			sql.NullString
+			password		sql.NullString
 			phoneNumber 	sql.NullString
-			balance 		sql.NullString
+			balance 		sql.NullInt64
 			createdAt 		sql.NullString
 			updatedAt 		sql.NullString
 		)
@@ -157,6 +175,8 @@ func (f *userRepo) GetList(ctx context.Context, req *models.GetListUserRequest) 
 			&id, 
 			&firstName,
 			&lastName,
+			&login,
+			&password,
 			&phoneNumber,
 			&balance, 
 			&createdAt,
@@ -171,8 +191,10 @@ func (f *userRepo) GetList(ctx context.Context, req *models.GetListUserRequest) 
 		Id: 		 id.String,
 		FirstName:   firstName.String,
 		LastName: 	 lastName.String,
+		Login:		 login.String,	
+		Password: 	 login.String,
 		PhoneNumber: phoneNumber.String,
-		Balance: 	 balance.String,
+		Balance: 	 balance.Int64,
 		CreatedAt: 	 createdAt.String,
 		UpdatedAt:   updatedAt.String,
 		})
@@ -195,8 +217,10 @@ func (f *userRepo) Update(ctx context.Context, req *models.UpdateUser) (int64, e
 		SET
 			first_name = :first_name,
 			last_name = :last_name,
+			login = :login,
+			password = :password,
 			phone_number = :phone_number,
-			balance = balance, 
+			balance = :balance, 
 			updated_at = now()
 		WHERE user_id = :user_id
 	`

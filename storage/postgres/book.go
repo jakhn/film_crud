@@ -62,7 +62,7 @@ func (f *bookRepo) GetByPKey(ctx context.Context, pkey *models.BookPrimarKey) (*
 		id        		sql.NullString
 		name 			sql.NullString
 		authorName 		sql.NullString
-		price 			sql.NullString
+		price 			sql.NullInt64
 		date 			sql.NullString
 		createdAt 		sql.NullString
 		updatedAt 		sql.NullString
@@ -89,6 +89,8 @@ func (f *bookRepo) GetByPKey(ctx context.Context, pkey *models.BookPrimarKey) (*
 			&authorName,
 			&price,
 			&date, 
+			&createdAt,
+			&updatedAt,
 		)
 
 	if err != nil {
@@ -99,7 +101,7 @@ func (f *bookRepo) GetByPKey(ctx context.Context, pkey *models.BookPrimarKey) (*
 		Id: 		 	id.String,
 		Name:   		name.String,
 		AuthorName: 	authorName.String,
-		Price: 			price.String,
+		Price: 			price.Int64,
 		Date: 	 		date.String,
 		CreatedAt: 	 	createdAt.String,
 		UpdatedAt:   	updatedAt.String,
@@ -146,7 +148,7 @@ func (f *bookRepo) GetList(ctx context.Context, req *models.GetListBookRequest) 
 			id        		sql.NullString
 			name 			sql.NullString
 			authorName 		sql.NullString
-			price 			sql.NullString
+			price 			sql.NullInt64
 			date 			sql.NullString
 			createdAt 		sql.NullString
 			updatedAt 		sql.NullString
@@ -171,7 +173,7 @@ func (f *bookRepo) GetList(ctx context.Context, req *models.GetListBookRequest) 
 		Id: 		 id.String,
 		Name:   	 name.String,
 		AuthorName:	 authorName.String,
-		Price:		 price.String,
+		Price:		 price.Int64,
 		Date: 	 	 date.String,
 		CreatedAt: 	 createdAt.String,
 		UpdatedAt:   updatedAt.String,
@@ -196,7 +198,7 @@ func (f *bookRepo) Update(ctx context.Context, req *models.UpdateBook) (int64, e
 			name = :name,
 			author_name = :author_name,
 			price = :price,
-			date = date, 
+			date = :date, 
 			updated_at = now()
 		WHERE book_id = :book_id
 	`

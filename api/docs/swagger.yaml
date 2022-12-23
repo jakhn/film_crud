@@ -12,7 +12,7 @@ definitions:
       name:
         type: string
       price:
-        type: string
+        type: integer
       updated_at:
         type: string
     type: object
@@ -25,22 +25,26 @@ definitions:
       name:
         type: string
       price:
-        type: string
+        type: integer
     type: object
   models.CreateOrder:
     properties:
-      book_id:
+      books_id:
         type: string
-      user_id:
+      users_id:
         type: string
     type: object
   models.CreateUser:
     properties:
       balance:
-        type: string
+        type: integer
       first_name:
         type: string
       last_name:
+        type: string
+      login:
+        type: string
+      password:
         type: string
       phone_number:
         type: string
@@ -60,7 +64,7 @@ definitions:
         type: integer
       orders:
         items:
-          $ref: '#/definitions/models.Order'
+          $ref: '#/definitions/models.OrderBook'
         type: array
     type: object
   models.GetListUserResponse:
@@ -72,9 +76,21 @@ definitions:
           $ref: '#/definitions/models.User'
         type: array
     type: object
+  models.Login:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    type: object
+  models.LoginResponse:
+    properties:
+      access_token:
+        type: string
+    type: object
   models.Order:
     properties:
-      book_id:
+      books_id:
         type: string
       created_at:
         type: string
@@ -82,53 +98,35 @@ definitions:
         type: string
       updated_at:
         type: string
-      user_id:
+      users_id:
         type: string
     type: object
-  models.UpdateBook:
+  models.OrderBook:
     properties:
-      author_name:
+      created_at:
         type: string
-      book_id:
-        type: string
-      date:
-        type: string
-      name:
-        type: string
-      price:
-        type: string
-    type: object
-  models.UpdateOrder:
-    properties:
-      book_id:
+      full_name:
         type: string
       order_id:
         type: string
-      user_id:
-        type: string
-    type: object
-  models.UpdateUser:
-    properties:
-      balance:
-        type: string
-      first_name:
-        type: string
-      last_name:
-        type: string
-      phone_number:
-        type: string
-      user_id:
+      price:
+        type: integer
+      updated_at:
         type: string
     type: object
   models.User:
     properties:
       balance:
-        type: string
+        type: integer
       created_at:
         type: string
       first_name:
         type: string
       last_name:
+        type: string
+      login:
+        type: string
+      password:
         type: string
       phone_number:
         type: string
@@ -191,7 +189,7 @@ paths:
         "201":
           description: GetBookBody
           schema:
-            $ref: '#/definitions/models.CreateBook'
+            $ref: '#/definitions/models.Book'
         "400":
           description: Invalid Argument
           schema:
@@ -278,7 +276,7 @@ paths:
         name: book
         required: true
         schema:
-          $ref: '#/definitions/models.UpdateBook'
+          $ref: '#/definitions/models.CreateBook'
       produces:
       - application/json
       responses:
@@ -297,6 +295,68 @@ paths:
       summary: Update Book
       tags:
       - Book
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Create Login
+      operationId: login
+      parameters:
+      - description: LoginRequestBody
+        in: body
+        name: Login
+        required: true
+        schema:
+          $ref: '#/definitions/models.Login'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: GetLoginBody
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: Invalid Argument
+          schema:
+            type: string
+        "500":
+          description: Server Error
+          schema:
+            type: string
+      summary: Create Login
+      tags:
+      - Login
+  /loginadmin:
+    post:
+      consumes:
+      - application/json
+      description: Create LoginAdmin
+      operationId: loginAdmin
+      parameters:
+      - description: LoginAdminRequestBody
+        in: body
+        name: Login
+        required: true
+        schema:
+          $ref: '#/definitions/models.Login'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: GetLoginAdminBody
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: Invalid Argument
+          schema:
+            type: string
+        "500":
+          description: Server Error
+          schema:
+            type: string
+      summary: Create LoginAdmin
+      tags:
+      - LoginAdmin
   /order:
     get:
       consumes:
@@ -348,7 +408,7 @@ paths:
         "201":
           description: GetOrderBody
           schema:
-            $ref: '#/definitions/models.Order'
+            $ref: '#/definitions/models.OrderBook'
         "400":
           description: Invalid Argument
           schema:
@@ -407,7 +467,7 @@ paths:
         "200":
           description: GetOrderBody
           schema:
-            $ref: '#/definitions/models.Order'
+            $ref: '#/definitions/models.OrderBook'
         "400":
           description: Invalid Argument
           schema:
@@ -435,7 +495,7 @@ paths:
         name: order
         required: true
         schema:
-          $ref: '#/definitions/models.UpdateOrder'
+          $ref: '#/definitions/models.OrderBook'
       produces:
       - application/json
       responses:
@@ -592,7 +652,7 @@ paths:
         name: actor
         required: true
         schema:
-          $ref: '#/definitions/models.UpdateUser'
+          $ref: '#/definitions/models.CreateUser'
       produces:
       - application/json
       responses:

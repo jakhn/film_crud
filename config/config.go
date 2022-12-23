@@ -9,6 +9,10 @@ type Config struct {
 	PostgresPassword       string
 	PostgresPort           string
 	PostgresMaxConnections int32
+
+	AuthSecretKey string
+	SuperAdmin    string
+	Client        string
 }
 
 func Load() Config {
@@ -18,11 +22,14 @@ func Load() Config {
 	cfg.HTTPPort = ":4000"
 
 	cfg.PostgresHost = "localhost"
-	cfg.PostgresUser = "jakh"
-	cfg.PostgresDatabase = "film"
+	cfg.PostgresUser = "jahongir"
+	cfg.PostgresDatabase = "h_database"
 	cfg.PostgresPassword = "00"
 	cfg.PostgresPort = "5432"
 	cfg.PostgresMaxConnections = 20
 
+	cfg.AuthSecretKey = "9K+WgNTglA44Hg=="
+	cfg.SuperAdmin = "Super"
+	cfg.Client = "Client"
 	return cfg
 }

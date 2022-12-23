@@ -5,22 +5,31 @@ type OrderPrimarKey struct {
 }
 
 type CreateOrder struct {
-	BookId string `json:"book_id"`
-	UserId string `json:"user_id"`
+	BooksId string `json:"books_id"`
+	UsersId string `json:"users_id"`
 }
 
 type Order struct {
 	Id       	string `json:"order_id"`
-	BookId    	string `json:"book_id"`
-	UserId    	string `json:"user_id"` 
+	BooksId    	string `json:"books_id"`
+	UsersId    	string `json:"users_id"` 
 	CreatedAt   string `json:"created_at"`
 	UpdatedAt   string `json:"updated_at"`
 }
 
 type UpdateOrder struct {
 	Id          string `json:"order_id"`
-	BookId    	string `json:"book_id"`
-	UserId    	string `json:"user_id"`  
+	BooksId    	string `json:"books_id"`
+	UsersId    	string `json:"users_id"`  
+}
+
+
+type OrderBook struct {
+	Id		 			string		`json:"order_id"`
+	FullName			string 		`json:"full_name"`
+	Price				int64 		`json:"price"`
+	CreatedAt	 		string  	`json:"created_at"`
+	UpdatedAt 			string  	`json:"updated_at"`	
 }
 
 type GetListOrderRequest struct {
@@ -30,5 +39,5 @@ type GetListOrderRequest struct {
 
 type GetListOrderResponse struct {
 	Count int32   	`json:"count"`
-	Orders []*Order `json:"orders"`
+	Orders []*OrderBook `json:"orders"`
 }

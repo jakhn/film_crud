@@ -32,8 +32,8 @@ func (f *orderRepo) Create(ctx context.Context, order *models.CreateOrder) (stri
 	query = `
 		INSERT INTO orders(
 			order_id,
-			book_id, 
-			user_id, 
+			books_id, 
+			users_id, 
 			created_at,
 			updated_at
 		) VALUES ( $1, $2 , $3,now(), now())
@@ -41,8 +41,8 @@ func (f *orderRepo) Create(ctx context.Context, order *models.CreateOrder) (stri
 
 	_, err := f.db.Exec(ctx, query,
 		id,
-		order.BookId,
-		order.UserId, 
+		order.BooksId,
+		order.UsersId, 
 	)
 
 	if err != nil {
@@ -56,8 +56,8 @@ func (f *orderRepo) GetByPKey(ctx context.Context, pkey *models.OrderPrimarKey) 
 
 	var (
 		id        		sql.NullString
-		bookId 			sql.NullString
-		userId 			sql.NullString 
+		booksId 			sql.NullString
+		usersId 			sql.NullString 
 		createdAt 		sql.NullString
 		updatedAt 		sql.NullString
 	)
@@ -65,8 +65,8 @@ func (f *orderRepo) GetByPKey(ctx context.Context, pkey *models.OrderPrimarKey) 
 	query := `
 		SELECT
 			order_id,
-			book_id,
-			user_id, 
+			books_id,
+			users_id, 
 			created_at,
 			updated_at
 		FROM
@@ -77,8 +77,10 @@ func (f *orderRepo) GetByPKey(ctx context.Context, pkey *models.OrderPrimarKey) 
 	err := f.db.QueryRow(ctx, query, pkey.Id).
 		Scan(
 			&id,
-			&bookId,
-			&userId, 
+			&booksId,
+			&usersId, 
+			&createdAt,
+			&updatedAt,
 		)
 
 	if err != nil {
@@ -87,8 +89,8 @@ func (f *orderRepo) GetByPKey(ctx context.Context, pkey *models.OrderPrimarKey) 
 
 	return &models.Order{
 		Id: 		 id.String,
-		BookId:  	 bookId.String,
-		UserId: 	 userId.String, 
+		BooksId:  	 booksId.String,
+		UsersId: 	 usersId.String, 
 		CreatedAt: 	 createdAt.String,
 		UpdatedAt:   updatedAt.String,
 	}, nil
@@ -114,12 +116,14 @@ func (f *orderRepo) GetList(ctx context.Context, req *models.GetListOrderRequest
 		SELECT
 			COUNT(*) OVER(),
 			order_id,
-			book_id,
-			user_id, 
+			users.first_name || ' ' || users.last_name as fullname,
+			books.price as price
 			created_at,
 			updated_at
 		FROM
 			orders
+		JOIN users ON orders.users_id = users.user_id
+		JOIN book ON book.book_id = orders.book_id
 	`
 
 	query += offset + limit
@@ -129,18 +133,18 @@ func (f *orderRepo) GetList(ctx context.Context, req *models.GetListOrderRequest
 	for rows.Next() {
 
 		var (
-			id        		sql.NullString
-			bookId 			sql.NullString
-			userId 			sql.NullString 
-			createdAt 		sql.NullString
-			updatedAt 		sql.NullString
+			id        			sql.NullString
+			fullName 			sql.NullString
+			price 				sql.NullInt64
+			createdAt 			sql.NullString
+			updatedAt 			sql.NullString
 		)
 
 		err := rows.Scan(
 			&resp.Count,
 			&id, 
-			&bookId,
-			&userId,  
+			&fullName,
+			&price,  
 			&createdAt,
 			&updatedAt,
 		)
@@ -149,12 +153,12 @@ func (f *orderRepo) GetList(ctx context.Context, req *models.GetListOrderRequest
 			return nil, err
 		}
 
-		resp.Orders = append(resp.Orders, &models.Order{
-		Id: 		 id.String,
-		BookId:	     bookId.String,
-		UserId: 	 userId.String, 
-		CreatedAt: 	 createdAt.String,
-		UpdatedAt:   updatedAt.String,
+		resp.Orders = append(resp.Orders, &models.OrderBook{
+		Id: 		 		id.String,
+		FullName:	     	fullName.String,
+		Price: 		 		price.Int64, 
+		CreatedAt: 	 		createdAt.String,
+		UpdatedAt:   		updatedAt.String,
 		})
 
 	}
@@ -173,16 +177,16 @@ func (f *orderRepo) Update(ctx context.Context, req *models.UpdateOrder) (int64,
 		UPDATE
 			orders
 		SET
-			book_id = :book_id,
-			user_id = :user_id, 
+			books_id = :books_id,
+			users_id = :users_id, 
 			updated_at = now()
 		WHERE order_id = :order_id
 	`
 
 	params = map[string]interface{}{
 		"order_id": 	req.Id,
-		"book_id": 		req.BookId,
-		"user_id":  	req.UserId, 
+		"books_id": 		req.BooksId,
+		"users_id":  	req.UsersId, 
 	}
 
 	query, args := helper.ReplaceQueryParams(query, params)

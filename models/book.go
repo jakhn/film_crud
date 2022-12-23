@@ -7,15 +7,15 @@ type BookPrimarKey struct {
 type CreateBook struct {
 	Name       	string 	`json:"name"`
 	AuthorName 	string 	`json:"author_name"`
-	Price 		string 	`json:"price"`
+	Price 		int64 	`json:"price"`
 	Date    	string  `json:"date"`
 }
 type Book struct {
 	Id          string `json:"book_id"`
 	Name       	string `json:"name"`
 	AuthorName 	string `json:"author_name"`
-	Price 		string `json:"price"`
-	Date    	string  `json:"date"`
+	Price 		int64  `json:"price"`
+	Date    	string `json:"date"`
 	CreatedAt   string `json:"created_at"`
 	UpdatedAt   string `json:"updated_at"`
 }
@@ -24,9 +24,12 @@ type UpdateBook struct {
 	Id          string `json:"book_id"` 
 	Name       	string `json:"name"`
 	AuthorName 	string `json:"author_name"`
-	Price 		string `json:"price"`
+	Price 		int64  `json:"price"`
 	Date    	string  `json:"date"`
 }
+
+
+
 
 type GetListBookRequest struct {
 	Limit  int32

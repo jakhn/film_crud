@@ -93,7 +93,7 @@ const docTemplate = `{
                     "201": {
                         "description": "GetBookBody",
                         "schema": {
-                            "$ref": "#/definitions/models.CreateBook"
+                            "$ref": "#/definitions/models.Book"
                         }
                     },
                     "400": {
@@ -182,7 +182,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UpdateBook"
+                            "$ref": "#/definitions/models.CreateBook"
                         }
                     }
                 ],
@@ -234,6 +234,100 @@ const docTemplate = `{
                         "description": "GetBookBody",
                         "schema": {
                             "$ref": "#/definitions/models.Book"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Argument",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "description": "Create Login",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Login"
+                ],
+                "summary": "Create Login",
+                "operationId": "login",
+                "parameters": [
+                    {
+                        "description": "LoginRequestBody",
+                        "name": "Login",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Login"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "GetLoginBody",
+                        "schema": {
+                            "$ref": "#/definitions/models.LoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Argument",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/loginadmin": {
+            "post": {
+                "description": "Create LoginAdmin",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoginAdmin"
+                ],
+                "summary": "Create LoginAdmin",
+                "operationId": "loginAdmin",
+                "parameters": [
+                    {
+                        "description": "LoginAdminRequestBody",
+                        "name": "Login",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Login"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "GetLoginAdminBody",
+                        "schema": {
+                            "$ref": "#/definitions/models.LoginResponse"
                         }
                     },
                     "400": {
@@ -328,7 +422,7 @@ const docTemplate = `{
                     "201": {
                         "description": "GetOrderBody",
                         "schema": {
-                            "$ref": "#/definitions/models.Order"
+                            "$ref": "#/definitions/models.OrderBook"
                         }
                     },
                     "400": {
@@ -373,7 +467,7 @@ const docTemplate = `{
                     "200": {
                         "description": "GetOrderBody",
                         "schema": {
-                            "$ref": "#/definitions/models.Order"
+                            "$ref": "#/definitions/models.OrderBook"
                         }
                     },
                     "400": {
@@ -417,7 +511,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UpdateOrder"
+                            "$ref": "#/definitions/models.OrderBook"
                         }
                     }
                 ],
@@ -652,7 +746,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UpdateUser"
+                            "$ref": "#/definitions/models.CreateUser"
                         }
                     }
                 ],
@@ -742,7 +836,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "price": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "updated_at": {
                     "type": "string"
@@ -762,17 +856,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "price": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
         },
         "models.CreateOrder": {
             "type": "object",
             "properties": {
-                "book_id": {
+                "books_id": {
                     "type": "string"
                 },
-                "user_id": {
+                "users_id": {
                     "type": "string"
                 }
             }
@@ -781,12 +875,18 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "balance": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "first_name": {
                     "type": "string"
                 },
                 "last_name": {
+                    "type": "string"
+                },
+                "login": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 },
                 "phone_number": {
@@ -817,7 +917,7 @@ const docTemplate = `{
                 "orders": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.Order"
+                        "$ref": "#/definitions/models.OrderBook"
                     }
                 }
             }
@@ -836,10 +936,29 @@ const docTemplate = `{
                 }
             }
         },
+        "models.Login": {
+            "type": "object",
+            "properties": {
+                "login": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Order": {
             "type": "object",
             "properties": {
-                "book_id": {
+                "books_id": {
                     "type": "string"
                 },
                 "created_at": {
@@ -851,61 +970,27 @@ const docTemplate = `{
                 "updated_at": {
                     "type": "string"
                 },
-                "user_id": {
+                "users_id": {
                     "type": "string"
                 }
             }
         },
-        "models.UpdateBook": {
+        "models.OrderBook": {
             "type": "object",
             "properties": {
-                "author_name": {
+                "created_at": {
                     "type": "string"
                 },
-                "book_id": {
-                    "type": "string"
-                },
-                "date": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "price": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.UpdateOrder": {
-            "type": "object",
-            "properties": {
-                "book_id": {
+                "full_name": {
                     "type": "string"
                 },
                 "order_id": {
                     "type": "string"
                 },
-                "user_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.UpdateUser": {
-            "type": "object",
-            "properties": {
-                "balance": {
-                    "type": "string"
+                "price": {
+                    "type": "integer"
                 },
-                "first_name": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "phone_number": {
-                    "type": "string"
-                },
-                "user_id": {
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -914,7 +999,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "balance": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "created_at": {
                     "type": "string"
@@ -923,6 +1008,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "last_name": {
+                    "type": "string"
+                },
+                "login": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 },
                 "phone_number": {

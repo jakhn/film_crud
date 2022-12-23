@@ -15,6 +15,8 @@ CREATE TABLE users (
         last_name VARCHAR NOT NULL,
         phone_number VARCHAR NOT NULL,
         balance INTEGER, 
+        login VARCHAR NOT NULL UNIQUE,
+        password VARCHAR NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL 
 );
@@ -22,7 +24,7 @@ CREATE TABLE users (
 CREATE TABLE orders (
         order_id UUID NOT NULL,
         books_id UUID NOT NULL REFERENCES book(book_id),
-        users_id UUID NOT NULL REFERENCES users(user_id),
+        users_id UUID NOT NULL REFERENCES users(user_id), 
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );

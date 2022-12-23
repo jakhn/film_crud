@@ -81,7 +81,7 @@
                     "201": {
                         "description": "GetBookBody",
                         "schema": {
-                            "$ref": "#/definitions/models.CreateBook"
+                            "$ref": "#/definitions/models.Book"
                         }
                     },
                     "400": {
@@ -170,7 +170,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UpdateBook"
+                            "$ref": "#/definitions/models.CreateBook"
                         }
                     }
                 ],
@@ -222,6 +222,100 @@
                         "description": "GetBookBody",
                         "schema": {
                             "$ref": "#/definitions/models.Book"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Argument",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "description": "Create Login",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Login"
+                ],
+                "summary": "Create Login",
+                "operationId": "login",
+                "parameters": [
+                    {
+                        "description": "LoginRequestBody",
+                        "name": "Login",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Login"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "GetLoginBody",
+                        "schema": {
+                            "$ref": "#/definitions/models.LoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Argument",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/loginadmin": {
+            "post": {
+                "description": "Create LoginAdmin",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoginAdmin"
+                ],
+                "summary": "Create LoginAdmin",
+                "operationId": "loginAdmin",
+                "parameters": [
+                    {
+                        "description": "LoginAdminRequestBody",
+                        "name": "Login",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Login"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "GetLoginAdminBody",
+                        "schema": {
+                            "$ref": "#/definitions/models.LoginResponse"
                         }
                     },
                     "400": {
@@ -316,7 +410,7 @@
                     "201": {
                         "description": "GetOrderBody",
                         "schema": {
-                            "$ref": "#/definitions/models.Order"
+                            "$ref": "#/definitions/models.OrderBook"
                         }
                     },
                     "400": {
@@ -361,7 +455,7 @@
                     "200": {
                         "description": "GetOrderBody",
                         "schema": {
-                            "$ref": "#/definitions/models.Order"
+                            "$ref": "#/definitions/models.OrderBook"
                         }
                     },
                     "400": {
@@ -405,7 +499,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UpdateOrder"
+                            "$ref": "#/definitions/models.OrderBook"
                         }
                     }
                 ],
@@ -640,7 +734,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UpdateUser"
+                            "$ref": "#/definitions/models.CreateUser"
                         }
                     }
                 ],
@@ -730,7 +824,7 @@
                     "type": "string"
                 },
                 "price": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "updated_at": {
                     "type": "string"
@@ -750,17 +844,17 @@
                     "type": "string"
                 },
                 "price": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
         },
         "models.CreateOrder": {
             "type": "object",
             "properties": {
-                "book_id": {
+                "books_id": {
                     "type": "string"
                 },
-                "user_id": {
+                "users_id": {
                     "type": "string"
                 }
             }
@@ -769,12 +863,18 @@
             "type": "object",
             "properties": {
                 "balance": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "first_name": {
                     "type": "string"
                 },
                 "last_name": {
+                    "type": "string"
+                },
+                "login": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 },
                 "phone_number": {
@@ -805,7 +905,7 @@
                 "orders": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.Order"
+                        "$ref": "#/definitions/models.OrderBook"
                     }
                 }
             }
@@ -824,10 +924,29 @@
                 }
             }
         },
+        "models.Login": {
+            "type": "object",
+            "properties": {
+                "login": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Order": {
             "type": "object",
             "properties": {
-                "book_id": {
+                "books_id": {
                     "type": "string"
                 },
                 "created_at": {
@@ -839,61 +958,27 @@
                 "updated_at": {
                     "type": "string"
                 },
-                "user_id": {
+                "users_id": {
                     "type": "string"
                 }
             }
         },
-        "models.UpdateBook": {
+        "models.OrderBook": {
             "type": "object",
             "properties": {
-                "author_name": {
+                "created_at": {
                     "type": "string"
                 },
-                "book_id": {
-                    "type": "string"
-                },
-                "date": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "price": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.UpdateOrder": {
-            "type": "object",
-            "properties": {
-                "book_id": {
+                "full_name": {
                     "type": "string"
                 },
                 "order_id": {
                     "type": "string"
                 },
-                "user_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.UpdateUser": {
-            "type": "object",
-            "properties": {
-                "balance": {
-                    "type": "string"
+                "price": {
+                    "type": "integer"
                 },
-                "first_name": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "phone_number": {
-                    "type": "string"
-                },
-                "user_id": {
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -902,7 +987,7 @@
             "type": "object",
             "properties": {
                 "balance": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "created_at": {
                     "type": "string"
@@ -911,6 +996,12 @@
                     "type": "string"
                 },
                 "last_name": {
+                    "type": "string"
+                },
+                "login": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 },
                 "phone_number": {

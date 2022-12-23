@@ -21,15 +21,10 @@ func SetUpApi(cfg *config.Config, r *gin.Engine, storage storage.StorageI) {
 	r.Use(customCORSMiddleware())
 
 	v1 := r.Group("/v1")
-	v2 := r.Group("/v2")
-
 	r.POST("/login", handlerV1.Login)
-	r.POST("/loginadmin", handlerV1.LoginAdmin)
+	r.POST("/loginadmin", handlerV1.LoginAdmin) 
 
-	r.POST("/refreshclienttoken")
-
-	v1.Use(checkTokenSuper())
-	v2.Use(checkTokenClient())
+	v1.Use(check()) 
 	r.POST("/book", handlerV1.CreateBook)
 	r.GET("/book/:id", handlerV1.GetBookById)
 	r.GET("/book", handlerV1.GetBookList)
@@ -42,17 +37,17 @@ func SetUpApi(cfg *config.Config, r *gin.Engine, storage storage.StorageI) {
 	r.PUT("/user/:id", handlerV1.UpdateUser)
 	r.DELETE("/user/:id", handlerV1.DeleteUser)
 
-	v2.POST("/order", handlerV1.CreateOrder)
+	v1.POST("/order", handlerV1.CreateOrder)
 	v1.GET("/order/:id", handlerV1.GetOrderById)
 	v1.GET("/order", handlerV1.GetOrderList)
-	v2.PUT("/order/:id", handlerV1.UpdateOrder)
-	v2.DELETE("/order/:id", handlerV1.DeleteOrder)
+	v1.PUT("/order/:id", handlerV1.UpdateOrder)
+	v1.DELETE("/order/:id", handlerV1.DeleteOrder)
 
 	url := ginSwagger.URL("swagger/doc.json") // The url pointing to API definition
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 }
 
-func checkTokenSuper() gin.HandlerFunc {
+func check() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		if _, ok := ctx.Request.Header["Authorization"]; ok {
 			_, err := helper.ExtractClaims(ctx.Request.Header["Authorization"][0], config.Load().AuthSecretKey)
@@ -67,20 +62,7 @@ func checkTokenSuper() gin.HandlerFunc {
 	}
 }
 
-func checkTokenClient() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		if _, ok := ctx.Request.Header["Authorization"]; ok {
-			_, err := helper.ExtractClaims(ctx.Request.Header["Authorization"][0], config.Load().AuthSecretKey)
-			_, err2 := helper.ExtractClaims(ctx.Request.Header["Authorization"][0], config.Load().Client)
-			if err != nil && err2 != nil {
-				ctx.AbortWithError(http.StatusForbidden, errors.New("not found password"))
-				return
-			} else {
-				ctx.Next()
-			}
-		}
-	}
-}
+
 
 func customCORSMiddleware() gin.HandlerFunc {
 

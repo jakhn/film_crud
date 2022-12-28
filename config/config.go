@@ -26,9 +26,9 @@ func Load() Config {
 	cfg.HTTPPort = ":4000"
 
 	cfg.PostgresHost = "localhost"
-	cfg.PostgresUser = "samandar"
-	cfg.PostgresDatabase = "book"
-	cfg.PostgresPassword = "samandevop"
+	cfg.PostgresUser = "jahongir"
+	cfg.PostgresDatabase = "h_localhost"
+	cfg.PostgresPassword = "00"
 	cfg.PostgresPort = "5432"
 	cfg.PostgresMaxConnections = 20
 

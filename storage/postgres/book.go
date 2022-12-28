@@ -8,21 +8,21 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
 
-	"github.com/jakhn/film_crud/models"
-	"github.com/jakhn/film_crud/pkg/helper"
+	"crud/models"
+	"crud/pkg/helper"
 )
 
-type bookRepo struct {
+type BookRepo struct {
 	db *pgxpool.Pool
 }
 
-func NewBookRepo(db *pgxpool.Pool) *bookRepo {
-	return &bookRepo{
+func NewBookRepo(db *pgxpool.Pool) *BookRepo {
+	return &BookRepo{
 		db: db,
 	}
 }
 
-func (f *bookRepo) Create(ctx context.Context, book *models.CreateBook) (string, error) {
+func (f *BookRepo) Create(ctx context.Context, book *models.CreateBook) (string, error) {
 
 	var (
 		id    = uuid.New().String()
@@ -30,23 +30,20 @@ func (f *bookRepo) Create(ctx context.Context, book *models.CreateBook) (string,
 	)
 
 	query = `
-		INSERT INTO book(
+		INSERT INTO books(
 			book_id,
-			name, 
-			author_name,
+			title,
+			author,
 			price,
-			date,
-			created_at,
 			updated_at
-		) VALUES ( $1, $2 , $3, $4, $5,now(),now())
+		) VALUES ( $1, $2, $3, $4, now() )
 	`
 
 	_, err := f.db.Exec(ctx, query,
 		id,
-		book.Name,
-		book.AuthorName,
+		book.Title,
+		book.Author,
 		book.Price,
-		book.Date,
 	)
 
 	if err != nil {
@@ -56,39 +53,36 @@ func (f *bookRepo) Create(ctx context.Context, book *models.CreateBook) (string,
 	return id, nil
 }
 
-func (f *bookRepo) GetByPKey(ctx context.Context, pkey *models.BookPrimarKey) (*models.Book, error) {
+func (f *BookRepo) GetByPKey(ctx context.Context, pkey *models.BookPrimarKey) (*models.Book, error) {
 
 	var (
-		id        		sql.NullString
-		name 			sql.NullString
-		authorName 		sql.NullString
-		price 			sql.NullInt64
-		date 			sql.NullString
-		createdAt 		sql.NullString
-		updatedAt 		sql.NullString
+		id        sql.NullString
+		title     sql.NullString
+		author    sql.NullString
+		price     sql.NullFloat64
+		createdAt sql.NullString
+		updatedAt sql.NullString
 	)
 
 	query := `
 		SELECT
 			book_id,
-			name, 
-			author_name,
+			title,
+			author,
 			price,
-			date,
 			created_at,
 			updated_at
 		FROM
-			book
+			books
 		WHERE book_id = $1
 	`
 
 	err := f.db.QueryRow(ctx, query, pkey.Id).
 		Scan(
 			&id,
-			&name,
-			&authorName,
+			&title,
+			&author,
 			&price,
-			&date, 
 			&createdAt,
 			&updatedAt,
 		)
@@ -98,22 +92,21 @@ func (f *bookRepo) GetByPKey(ctx context.Context, pkey *models.BookPrimarKey) (*
 	}
 
 	return &models.Book{
-		Id: 		 	id.String,
-		Name:   		name.String,
-		AuthorName: 	authorName.String,
-		Price: 			price.Int64,
-		Date: 	 		date.String,
-		CreatedAt: 	 	createdAt.String,
-		UpdatedAt:   	updatedAt.String,
+		Id:        id.String,
+		Title:     title.String,
+		Author:    author.String,
+		Price:     price.Float64,
+		CreatedAt: createdAt.String,
+		UpdatedAt: updatedAt.String,
 	}, nil
 }
 
-func (f *bookRepo) GetList(ctx context.Context, req *models.GetListBookRequest) (*models.GetListBookResponse, error) {
+func (f *BookRepo) GetList(ctx context.Context, req *models.GetListBookRequest) (*models.GetListBookResponse, error) {
 
 	var (
 		resp   = models.GetListBookResponse{}
-		offset = " OFFSET 0"
-		limit  = " LIMIT 10"
+		offset = ""
+		limit  = ""
 	)
 
 	if req.Limit > 0 {
@@ -128,14 +121,13 @@ func (f *bookRepo) GetList(ctx context.Context, req *models.GetListBookRequest) 
 		SELECT
 			COUNT(*) OVER(),
 			book_id,
-			name, 
-			author_name,
+			title,
+			author,
 			price,
-			date,
 			created_at,
 			updated_at
 		FROM
-			book
+			books
 	`
 
 	query += offset + limit
@@ -145,22 +137,20 @@ func (f *bookRepo) GetList(ctx context.Context, req *models.GetListBookRequest) 
 	for rows.Next() {
 
 		var (
-			id        		sql.NullString
-			name 			sql.NullString
-			authorName 		sql.NullString
-			price 			sql.NullInt64
-			date 			sql.NullString
-			createdAt 		sql.NullString
-			updatedAt 		sql.NullString
+			id        sql.NullString
+			title     sql.NullString
+			author    sql.NullString
+			price     sql.NullFloat64
+			createdAt sql.NullString
+			updatedAt sql.NullString
 		)
 
 		err := rows.Scan(
 			&resp.Count,
-			&id, 
-			&name,
-			&authorName,
+			&id,
+			&title,
+			&author,
 			&price,
-			&date, 
 			&createdAt,
 			&updatedAt,
 		)
@@ -170,13 +160,12 @@ func (f *bookRepo) GetList(ctx context.Context, req *models.GetListBookRequest) 
 		}
 
 		resp.Books = append(resp.Books, &models.Book{
-		Id: 		 id.String,
-		Name:   	 name.String,
-		AuthorName:	 authorName.String,
-		Price:		 price.Int64,
-		Date: 	 	 date.String,
-		CreatedAt: 	 createdAt.String,
-		UpdatedAt:   updatedAt.String,
+			Id:        id.String,
+			Title:     title.String,
+			Author:    author.String,
+			Price:     price.Float64,
+			CreatedAt: createdAt.String,
+			UpdatedAt: updatedAt.String,
 		})
 
 	}
@@ -184,7 +173,7 @@ func (f *bookRepo) GetList(ctx context.Context, req *models.GetListBookRequest) 
 	return &resp, err
 }
 
-func (f *bookRepo) Update(ctx context.Context, req *models.UpdateBook) (int64, error) {
+func (f *BookRepo) Update(ctx context.Context, req *models.UpdateBook) (int64, error) {
 
 	var (
 		query  = ""
@@ -193,22 +182,20 @@ func (f *bookRepo) Update(ctx context.Context, req *models.UpdateBook) (int64, e
 
 	query = `
 		UPDATE
-			book
+			books
 		SET
-			name = :name,
-			author_name = :author_name,
+			title = :title,
+			author = :author,
 			price = :price,
-			date = :date, 
 			updated_at = now()
 		WHERE book_id = :book_id
 	`
 
 	params = map[string]interface{}{
-		"book_id": 			req.Id,
-		"name": 			req.Name,
-		"author_name":  	req.AuthorName,
-		"price": 			req.Price,
-		"date": 			req.Date, 
+		"book_id": req.Id,
+		"title":   req.Title,
+		"author":  req.Author,
+		"price":   req.Price,
 	}
 
 	query, args := helper.ReplaceQueryParams(query, params)
@@ -221,9 +208,9 @@ func (f *bookRepo) Update(ctx context.Context, req *models.UpdateBook) (int64, e
 	return rowsAffected.RowsAffected(), nil
 }
 
-func (f *bookRepo) Delete(ctx context.Context, req *models.BookPrimarKey) error {
+func (f *BookRepo) Delete(ctx context.Context, req *models.BookPrimarKey) error {
 
-	_, err := f.db.Exec(ctx, "DELETE FROM book WHERE book_id = $1", req.Id)
+	_, err := f.db.Exec(ctx, "DELETE FROM books WHERE book_id = $1", req.Id)
 	if err != nil {
 		return err
 	}

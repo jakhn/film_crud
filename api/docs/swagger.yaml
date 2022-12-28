@@ -1,43 +1,39 @@
 definitions:
   models.Book:
     properties:
-      author_name:
+      author:
         type: string
       book_id:
         type: string
       created_at:
         type: string
-      date:
-        type: string
-      name:
-        type: string
       price:
-        type: integer
+        type: number
+      title:
+        type: string
       updated_at:
         type: string
     type: object
   models.CreateBook:
     properties:
-      author_name:
-        type: string
-      date:
-        type: string
-      name:
+      author:
         type: string
       price:
-        type: integer
-    type: object
-  models.CreateOrder:
-    properties:
-      books_id:
+        type: number
+      title:
         type: string
-      users_id:
+    type: object
+  models.CreateOrderSwagger:
+    properties:
+      book_id:
+        type: string
+      user_id:
         type: string
     type: object
   models.CreateUser:
     properties:
       balance:
-        type: integer
+        type: number
       first_name:
         type: string
       last_name:
@@ -64,7 +60,7 @@ definitions:
         type: integer
       orders:
         items:
-          $ref: '#/definitions/models.OrderBook'
+          $ref: '#/definitions/models.OrderGroup'
         type: array
     type: object
   models.GetListUserResponse:
@@ -90,34 +86,67 @@ definitions:
     type: object
   models.Order:
     properties:
-      books_id:
+      book_id:
         type: string
       created_at:
         type: string
       order_id:
         type: string
+      payed:
+        type: number
       updated_at:
         type: string
-      users_id:
+      user_id:
         type: string
     type: object
-  models.OrderBook:
+  models.OrderGroup:
     properties:
       created_at:
         type: string
-      full_name:
+      fullname:
         type: string
-      order_id:
+      payed:
+        type: number
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.UpdateBookSwagger:
+    properties:
+      author:
         type: string
       price:
-        type: integer
-      updated_at:
+        type: number
+      title:
+        type: string
+    type: object
+  models.UpdateOrderSwagger:
+    properties:
+      book_id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  models.UpdateUserSwagger:
+    properties:
+      balance:
+        type: number
+      first_name:
+        type: string
+      last_name:
+        type: string
+      login:
+        type: string
+      password:
+        type: string
+      phone_number:
         type: string
     type: object
   models.User:
     properties:
       balance:
-        type: integer
+        type: number
       created_at:
         type: string
       first_name:
@@ -177,7 +206,7 @@ paths:
       description: Create Book
       operationId: create_book
       parameters:
-      - description: CreateBookRequestBody
+      - description: CreatebookRequestBody
         in: body
         name: book
         required: true
@@ -187,7 +216,7 @@ paths:
       - application/json
       responses:
         "201":
-          description: GetBookBody
+          description: GetbookBody
           schema:
             $ref: '#/definitions/models.Book'
         "400":
@@ -276,7 +305,7 @@ paths:
         name: book
         required: true
         schema:
-          $ref: '#/definitions/models.CreateBook'
+          $ref: '#/definitions/models.UpdateBookSwagger'
       produces:
       - application/json
       responses:
@@ -326,14 +355,14 @@ paths:
       summary: Create Login
       tags:
       - Login
-  /loginadmin:
+  /loginsuper:
     post:
       consumes:
       - application/json
-      description: Create LoginAdmin
-      operationId: loginAdmin
+      description: Create LoginSuper
+      operationId: loginSuper
       parameters:
-      - description: LoginAdminRequestBody
+      - description: LoginSuperRequestBody
         in: body
         name: Login
         required: true
@@ -343,7 +372,7 @@ paths:
       - application/json
       responses:
         "201":
-          description: GetLoginAdminBody
+          description: GetLoginSuperBody
           schema:
             $ref: '#/definitions/models.LoginResponse'
         "400":
@@ -354,9 +383,9 @@ paths:
           description: Server Error
           schema:
             type: string
-      summary: Create LoginAdmin
+      summary: Create LoginSuper
       tags:
-      - LoginAdmin
+      - LoginSuper
   /order:
     get:
       consumes:
@@ -401,14 +430,14 @@ paths:
         name: order
         required: true
         schema:
-          $ref: '#/definitions/models.CreateOrder'
+          $ref: '#/definitions/models.CreateOrderSwagger'
       produces:
       - application/json
       responses:
         "201":
           description: GetOrderBody
           schema:
-            $ref: '#/definitions/models.OrderBook'
+            $ref: '#/definitions/models.Order'
         "400":
           description: Invalid Argument
           schema:
@@ -467,7 +496,7 @@ paths:
         "200":
           description: GetOrderBody
           schema:
-            $ref: '#/definitions/models.OrderBook'
+            $ref: '#/definitions/models.Order'
         "400":
           description: Invalid Argument
           schema:
@@ -495,7 +524,7 @@ paths:
         name: order
         required: true
         schema:
-          $ref: '#/definitions/models.OrderBook'
+          $ref: '#/definitions/models.UpdateOrderSwagger'
       produces:
       - application/json
       responses:
@@ -563,7 +592,7 @@ paths:
       - application/json
       responses:
         "201":
-          description: GetUserrBody
+          description: GetUserBody
           schema:
             $ref: '#/definitions/models.User'
         "400":
@@ -649,10 +678,10 @@ paths:
         type: string
       - description: CreateUserRequestBody
         in: body
-        name: actor
+        name: user
         required: true
         schema:
-          $ref: '#/definitions/models.CreateUser'
+          $ref: '#/definitions/models.UpdateUserSwagger'
       produces:
       - application/json
       responses:

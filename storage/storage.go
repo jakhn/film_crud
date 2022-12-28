@@ -3,14 +3,14 @@ package storage
 import (
 	"context"
 
-	"github.com/jakhn/film_crud/models"
+	"crud/models"
 )
 
 type StorageI interface {
 	CloseDB()
-	Book() 	BookRepoI
+	Book() BookRepoI
+	User() UserRepoI
 	Order() OrderRepoI
-	User() 	UserRepoI
 }
 
 type BookRepoI interface {

@@ -8,41 +8,61 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
 
-	"github.com/jakhn/film_crud/models"
-	"github.com/jakhn/film_crud/pkg/helper"
+	"crud/models"
+	"crud/pkg/helper"
 )
 
-type orderRepo struct {
+type OrderRepo struct {
 	db *pgxpool.Pool
 }
 
-func NewOrderRepo(db *pgxpool.Pool) *orderRepo {
-	return &orderRepo{
+func NewOrderRepo(db *pgxpool.Pool) *OrderRepo {
+	return &OrderRepo{
 		db: db,
 	}
 }
 
-func (f *orderRepo) Create(ctx context.Context, order *models.CreateOrder) (string, error) {
+func (f *OrderRepo) Create(ctx context.Context, order *models.CreateOrder) (string, error) {
 
 	var (
-		id    = uuid.New().String()
-		query string
+		id            = uuid.New().String()
+		payed         sql.NullFloat64
+		queryGetPrice string
+		query         string
 	)
+
+	queryGetPrice = `
+		SELECT
+			price
+		FROM
+			books
+		WHERE book_id = $1
+	`
 
 	query = `
 		INSERT INTO orders(
 			order_id,
-			books_id, 
-			users_id, 
-			created_at,
+			user_id,
+			book_id,
+			payed,
 			updated_at
-		) VALUES ( $1, $2 , $3,now(), now())
+		) VALUES ( $1, $2, $3, $4, now() )
 	`
 
-	_, err := f.db.Exec(ctx, query,
+	err := f.db.QueryRow(ctx, queryGetPrice, order.Book_id).
+		Scan(
+			&payed,
+		)
+
+	if err != nil {
+		return "", err
+	}
+
+	_, err = f.db.Exec(ctx, query,
 		id,
-		order.BooksId,
-		order.UsersId, 
+		order.User_id,
+		order.Book_id,
+		payed,
 	)
 
 	if err != nil {
@@ -52,22 +72,22 @@ func (f *orderRepo) Create(ctx context.Context, order *models.CreateOrder) (stri
 	return id, nil
 }
 
-func (f *orderRepo) GetByPKey(ctx context.Context, pkey *models.OrderPrimarKey) (*models.Order, error) {
+func (f *OrderRepo) GetByPKey(ctx context.Context, pkey *models.OrderPrimarKey) (*models.Order, error) {
 
 	var (
-		id        		sql.NullString
-		booksId 			sql.NullString
-		usersId 			sql.NullString 
-		createdAt 		sql.NullString
-		updatedAt 		sql.NullString
+		id         sql.NullString
+		user_id    sql.NullString
+		book_id    sql.NullString
+		payed      sql.NullFloat64
+		created_at sql.NullString
 	)
 
 	query := `
 		SELECT
 			order_id,
-			books_id,
-			users_id, 
-			created_at,
+			user_id,
+			book_id,
+			payed,
 			updated_at
 		FROM
 			orders
@@ -77,10 +97,10 @@ func (f *orderRepo) GetByPKey(ctx context.Context, pkey *models.OrderPrimarKey) 
 	err := f.db.QueryRow(ctx, query, pkey.Id).
 		Scan(
 			&id,
-			&booksId,
-			&usersId, 
-			&createdAt,
-			&updatedAt,
+			&user_id,
+			&book_id,
+			&payed,
+			&created_at,
 		)
 
 	if err != nil {
@@ -88,20 +108,20 @@ func (f *orderRepo) GetByPKey(ctx context.Context, pkey *models.OrderPrimarKey) 
 	}
 
 	return &models.Order{
-		Id: 		 id.String,
-		BooksId:  	 booksId.String,
-		UsersId: 	 usersId.String, 
-		CreatedAt: 	 createdAt.String,
-		UpdatedAt:   updatedAt.String,
+		Id:        id.String,
+		User_id:   user_id.String,
+		Book_id:   book_id.String,
+		Payed:     payed.Float64,
+		CreatedAt: created_at.String,
 	}, nil
 }
 
-func (f *orderRepo) GetList(ctx context.Context, req *models.GetListOrderRequest) (*models.GetListOrderResponse, error) {
+func (f *OrderRepo) GetList(ctx context.Context, req *models.GetListOrderRequest) (*models.GetListOrderResponse, error) {
 
 	var (
 		resp   = models.GetListOrderResponse{}
-		offset = " OFFSET 0"
-		limit  = " LIMIT 10"
+		offset = ""
+		limit  = ""
 	)
 
 	if req.Limit > 0 {
@@ -113,17 +133,17 @@ func (f *orderRepo) GetList(ctx context.Context, req *models.GetListOrderRequest
 	}
 
 	query := `
-		SELECT
+		SELECT 
 			COUNT(*) OVER(),
-			order_id,
 			users.first_name || ' ' || users.last_name as fullname,
-			books.price as price
-			created_at,
-			updated_at
+			books.title,
+			orders.payed,
+			orders.created_at,
+			orders.updated_at
 		FROM
 			orders
-		JOIN users ON orders.users_id = users.user_id
-		JOIN book ON book.book_id = orders.book_id
+		JOIN users ON orders.user_id = users.user_id
+		JOIN books ON orders.book_id = books.book_id
 	`
 
 	query += offset + limit
@@ -133,32 +153,32 @@ func (f *orderRepo) GetList(ctx context.Context, req *models.GetListOrderRequest
 	for rows.Next() {
 
 		var (
-			id        			sql.NullString
-			fullName 			sql.NullString
-			price 				sql.NullInt64
-			createdAt 			sql.NullString
-			updatedAt 			sql.NullString
+			fullname   sql.NullString
+			title      sql.NullString
+			payed      sql.NullFloat64
+			created_at sql.NullString
+			updated_at sql.NullString
 		)
 
 		err := rows.Scan(
 			&resp.Count,
-			&id, 
-			&fullName,
-			&price,  
-			&createdAt,
-			&updatedAt,
+			&fullname,
+			&title,
+			&payed,
+			&created_at,
+			&updated_at,
 		)
 
 		if err != nil {
 			return nil, err
 		}
 
-		resp.Orders = append(resp.Orders, &models.OrderBook{
-		Id: 		 		id.String,
-		FullName:	     	fullName.String,
-		Price: 		 		price.Int64, 
-		CreatedAt: 	 		createdAt.String,
-		UpdatedAt:   		updatedAt.String,
+		resp.Orders = append(resp.Orders, &models.OrderGroup{
+			FullName:  fullname.String,
+			Title:     title.String,
+			Payed:     payed.Float64,
+			CreatedAt: created_at.String,
+			UpdatedAt: updated_at.String,
 		})
 
 	}
@@ -166,27 +186,48 @@ func (f *orderRepo) GetList(ctx context.Context, req *models.GetListOrderRequest
 	return &resp, err
 }
 
-func (f *orderRepo) Update(ctx context.Context, req *models.UpdateOrder) (int64, error) {
+func (f *OrderRepo) Update(ctx context.Context, req *models.UpdateOrder) (int64, error) {
 
 	var (
-		query  = ""
-		params map[string]interface{}
+		query         = ""
+		queryGetPrice = ""
+		params        map[string]interface{}
 	)
+
+	queryGetPrice = `
+		SELECT
+			price
+		FROM
+			books
+		WHERE book_id = $1
+	`
 
 	query = `
 		UPDATE
 			orders
 		SET
-			books_id = :books_id,
-			users_id = :users_id, 
+			user_id = :user_id,
+			book_id = :book_id,
+			payed = :payed,
 			updated_at = now()
 		WHERE order_id = :order_id
 	`
 
+	err := f.db.QueryRow(ctx, queryGetPrice, req.Book_id).
+		Scan(
+			&req.Payed,
+		)
+
+	fmt.Println(req.Payed)
+	if err != nil {
+		return 0, err
+	}
+
 	params = map[string]interface{}{
-		"order_id": 	req.Id,
-		"books_id": 		req.BooksId,
-		"users_id":  	req.UsersId, 
+		"order_id": req.Id,
+		"user_id":  req.User_id,
+		"book_id":  req.Book_id,
+		"payed":    req.Payed,
 	}
 
 	query, args := helper.ReplaceQueryParams(query, params)
@@ -199,7 +240,7 @@ func (f *orderRepo) Update(ctx context.Context, req *models.UpdateOrder) (int64,
 	return rowsAffected.RowsAffected(), nil
 }
 
-func (f *orderRepo) Delete(ctx context.Context, req *models.OrderPrimarKey) error {
+func (f *OrderRepo) Delete(ctx context.Context, req *models.OrderPrimarKey) error {
 
 	_, err := f.db.Exec(ctx, "DELETE FROM orders WHERE order_id = $1", req.Id)
 	if err != nil {

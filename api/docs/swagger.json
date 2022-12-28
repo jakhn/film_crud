@@ -68,7 +68,7 @@
                 "operationId": "create_book",
                 "parameters": [
                     {
-                        "description": "CreateBookRequestBody",
+                        "description": "CreatebookRequestBody",
                         "name": "book",
                         "in": "body",
                         "required": true,
@@ -79,7 +79,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "GetBookBody",
+                        "description": "GetbookBody",
                         "schema": {
                             "$ref": "#/definitions/models.Book"
                         }
@@ -170,7 +170,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.CreateBook"
+                            "$ref": "#/definitions/models.UpdateBookSwagger"
                         }
                     }
                 ],
@@ -286,9 +286,9 @@
                 }
             }
         },
-        "/loginadmin": {
+        "/loginsuper": {
             "post": {
-                "description": "Create LoginAdmin",
+                "description": "Create LoginSuper",
                 "consumes": [
                     "application/json"
                 ],
@@ -296,13 +296,13 @@
                     "application/json"
                 ],
                 "tags": [
-                    "LoginAdmin"
+                    "LoginSuper"
                 ],
-                "summary": "Create LoginAdmin",
-                "operationId": "loginAdmin",
+                "summary": "Create LoginSuper",
+                "operationId": "loginSuper",
                 "parameters": [
                     {
-                        "description": "LoginAdminRequestBody",
+                        "description": "LoginSuperRequestBody",
                         "name": "Login",
                         "in": "body",
                         "required": true,
@@ -313,7 +313,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "GetLoginAdminBody",
+                        "description": "GetLoginSuperBody",
                         "schema": {
                             "$ref": "#/definitions/models.LoginResponse"
                         }
@@ -402,7 +402,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.CreateOrder"
+                            "$ref": "#/definitions/models.CreateOrderSwagger"
                         }
                     }
                 ],
@@ -410,7 +410,7 @@
                     "201": {
                         "description": "GetOrderBody",
                         "schema": {
-                            "$ref": "#/definitions/models.OrderBook"
+                            "$ref": "#/definitions/models.Order"
                         }
                     },
                     "400": {
@@ -455,7 +455,7 @@
                     "200": {
                         "description": "GetOrderBody",
                         "schema": {
-                            "$ref": "#/definitions/models.OrderBook"
+                            "$ref": "#/definitions/models.Order"
                         }
                     },
                     "400": {
@@ -499,7 +499,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.OrderBook"
+                            "$ref": "#/definitions/models.UpdateOrderSwagger"
                         }
                     }
                 ],
@@ -643,7 +643,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "GetUserrBody",
+                        "description": "GetUserBody",
                         "schema": {
                             "$ref": "#/definitions/models.User"
                         }
@@ -730,11 +730,11 @@
                     },
                     {
                         "description": "CreateUserRequestBody",
-                        "name": "actor",
+                        "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.CreateUser"
+                            "$ref": "#/definitions/models.UpdateUserSwagger"
                         }
                     }
                 ],
@@ -808,7 +808,7 @@
         "models.Book": {
             "type": "object",
             "properties": {
-                "author_name": {
+                "author": {
                     "type": "string"
                 },
                 "book_id": {
@@ -817,14 +817,11 @@
                 "created_at": {
                     "type": "string"
                 },
-                "date": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
                 "price": {
-                    "type": "integer"
+                    "type": "number"
+                },
+                "title": {
+                    "type": "string"
                 },
                 "updated_at": {
                     "type": "string"
@@ -834,27 +831,24 @@
         "models.CreateBook": {
             "type": "object",
             "properties": {
-                "author_name": {
-                    "type": "string"
-                },
-                "date": {
-                    "type": "string"
-                },
-                "name": {
+                "author": {
                     "type": "string"
                 },
                 "price": {
-                    "type": "integer"
+                    "type": "number"
+                },
+                "title": {
+                    "type": "string"
                 }
             }
         },
-        "models.CreateOrder": {
+        "models.CreateOrderSwagger": {
             "type": "object",
             "properties": {
-                "books_id": {
+                "book_id": {
                     "type": "string"
                 },
-                "users_id": {
+                "user_id": {
                     "type": "string"
                 }
             }
@@ -863,7 +857,7 @@
             "type": "object",
             "properties": {
                 "balance": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "first_name": {
                     "type": "string"
@@ -905,7 +899,7 @@
                 "orders": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.OrderBook"
+                        "$ref": "#/definitions/models.OrderGroup"
                     }
                 }
             }
@@ -946,7 +940,7 @@
         "models.Order": {
             "type": "object",
             "properties": {
-                "books_id": {
+                "book_id": {
                     "type": "string"
                 },
                 "created_at": {
@@ -955,30 +949,81 @@
                 "order_id": {
                     "type": "string"
                 },
+                "payed": {
+                    "type": "number"
+                },
                 "updated_at": {
                     "type": "string"
                 },
-                "users_id": {
+                "user_id": {
                     "type": "string"
                 }
             }
         },
-        "models.OrderBook": {
+        "models.OrderGroup": {
             "type": "object",
             "properties": {
                 "created_at": {
                     "type": "string"
                 },
-                "full_name": {
+                "fullname": {
                     "type": "string"
                 },
-                "order_id": {
+                "payed": {
+                    "type": "number"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateBookSwagger": {
+            "type": "object",
+            "properties": {
+                "author": {
                     "type": "string"
                 },
                 "price": {
-                    "type": "integer"
+                    "type": "number"
                 },
-                "updated_at": {
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateOrderSwagger": {
+            "type": "object",
+            "properties": {
+                "book_id": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateUserSwagger": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "type": "number"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "login": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "phone_number": {
                     "type": "string"
                 }
             }
@@ -987,7 +1032,7 @@
             "type": "object",
             "properties": {
                 "balance": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "created_at": {
                     "type": "string"

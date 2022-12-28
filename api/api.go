@@ -1,11 +1,11 @@
 package api
 
 import (
-	_ "github.com/jakhn/film_crud/api/docs"
-	"github.com/jakhn/film_crud/api/handler"
-	"github.com/jakhn/film_crud/config"
-	"github.com/jakhn/film_crud/pkg/helper"
-	"github.com/jakhn/film_crud/storage"
+	_ "crud/api/docs"
+	"crud/api/handler"
+	"crud/config"
+	"crud/pkg/helper"
+	"crud/storage"
 	"errors"
 	"net/http"
 
@@ -14,17 +14,22 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func SetUpApi(cfg *config.Config, r *gin.Engine, storage storage.StorageI) {
+func SetUpApi(cfg *config.Config, r *gin.Engine, storage storage.StorageI, cache storage.CacheI) {
 
-	handlerV1 := handler.NewHandlerV1(cfg ,storage)
+	handlerV1 := handler.NewHandlerV1(cfg, storage, cache)
 
 	r.Use(customCORSMiddleware())
 
-	v1 := r.Group("/v1")
-	r.POST("/login", handlerV1.Login)
-	r.POST("/loginadmin", handlerV1.LoginAdmin) 
+	// v1 := r.Group("/v1")
+	// v2 := r.Group("/v2")
 
-	v1.Use(check()) 
+	r.POST("/login", handlerV1.Login)
+	r.POST("/loginsuper", handlerV1.LoginSuper)
+
+	r.POST("/refreshclienttoken")
+
+	r.Use(checkTokenSuper())
+	r.Use(checkTokenClient())
 	r.POST("/book", handlerV1.CreateBook)
 	r.GET("/book/:id", handlerV1.GetBookById)
 	r.GET("/book", handlerV1.GetBookList)
@@ -33,21 +38,21 @@ func SetUpApi(cfg *config.Config, r *gin.Engine, storage storage.StorageI) {
 
 	r.POST("/user", handlerV1.CreateUser)
 	r.GET("/user/:id", handlerV1.GetUserById)
-	v1.GET("/user", handlerV1.GetUserList)
+	r.GET("/user", handlerV1.GetUserList)
 	r.PUT("/user/:id", handlerV1.UpdateUser)
 	r.DELETE("/user/:id", handlerV1.DeleteUser)
 
-	v1.POST("/order", handlerV1.CreateOrder)
-	v1.GET("/order/:id", handlerV1.GetOrderById)
-	v1.GET("/order", handlerV1.GetOrderList)
-	v1.PUT("/order/:id", handlerV1.UpdateOrder)
-	v1.DELETE("/order/:id", handlerV1.DeleteOrder)
+	r.POST("/order", handlerV1.CreateOrder)
+	r.GET("/order/:id", handlerV1.GetOrderById)
+	r.GET("/order", handlerV1.GetOrderList)
+	r.PUT("/order/:id", handlerV1.UpdateOrder)
+	r.DELETE("/order/:id", handlerV1.DeleteOrder)
 
 	url := ginSwagger.URL("swagger/doc.json") // The url pointing to API definition
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 }
 
-func check() gin.HandlerFunc {
+func checkTokenSuper() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		if _, ok := ctx.Request.Header["Authorization"]; ok {
 			_, err := helper.ExtractClaims(ctx.Request.Header["Authorization"][0], config.Load().AuthSecretKey)
@@ -62,7 +67,20 @@ func check() gin.HandlerFunc {
 	}
 }
 
-
+func checkTokenClient() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		if _, ok := ctx.Request.Header["Authorization"]; ok {
+			_, err := helper.ExtractClaims(ctx.Request.Header["Authorization"][0], config.Load().AuthSecretKey)
+			_, err2 := helper.ExtractClaims(ctx.Request.Header["Authorization"][0], config.Load().Client)
+			if err != nil && err2 != nil {
+				ctx.AbortWithError(http.StatusForbidden, errors.New("not found password"))
+				return
+			} else {
+				ctx.Next()
+			}
+		}
+	}
+}
 
 func customCORSMiddleware() gin.HandlerFunc {
 

@@ -80,7 +80,7 @@ const docTemplate = `{
                 "operationId": "create_book",
                 "parameters": [
                     {
-                        "description": "CreateBookRequestBody",
+                        "description": "CreatebookRequestBody",
                         "name": "book",
                         "in": "body",
                         "required": true,
@@ -91,7 +91,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "GetBookBody",
+                        "description": "GetbookBody",
                         "schema": {
                             "$ref": "#/definitions/models.Book"
                         }
@@ -182,7 +182,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.CreateBook"
+                            "$ref": "#/definitions/models.UpdateBookSwagger"
                         }
                     }
                 ],
@@ -298,9 +298,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/loginadmin": {
+        "/loginsuper": {
             "post": {
-                "description": "Create LoginAdmin",
+                "description": "Create LoginSuper",
                 "consumes": [
                     "application/json"
                 ],
@@ -308,13 +308,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "LoginAdmin"
+                    "LoginSuper"
                 ],
-                "summary": "Create LoginAdmin",
-                "operationId": "loginAdmin",
+                "summary": "Create LoginSuper",
+                "operationId": "loginSuper",
                 "parameters": [
                     {
-                        "description": "LoginAdminRequestBody",
+                        "description": "LoginSuperRequestBody",
                         "name": "Login",
                         "in": "body",
                         "required": true,
@@ -325,7 +325,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "GetLoginAdminBody",
+                        "description": "GetLoginSuperBody",
                         "schema": {
                             "$ref": "#/definitions/models.LoginResponse"
                         }
@@ -414,7 +414,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.CreateOrder"
+                            "$ref": "#/definitions/models.CreateOrderSwagger"
                         }
                     }
                 ],
@@ -422,7 +422,7 @@ const docTemplate = `{
                     "201": {
                         "description": "GetOrderBody",
                         "schema": {
-                            "$ref": "#/definitions/models.OrderBook"
+                            "$ref": "#/definitions/models.Order"
                         }
                     },
                     "400": {
@@ -467,7 +467,7 @@ const docTemplate = `{
                     "200": {
                         "description": "GetOrderBody",
                         "schema": {
-                            "$ref": "#/definitions/models.OrderBook"
+                            "$ref": "#/definitions/models.Order"
                         }
                     },
                     "400": {
@@ -511,7 +511,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.OrderBook"
+                            "$ref": "#/definitions/models.UpdateOrderSwagger"
                         }
                     }
                 ],
@@ -655,7 +655,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "GetUserrBody",
+                        "description": "GetUserBody",
                         "schema": {
                             "$ref": "#/definitions/models.User"
                         }
@@ -742,11 +742,11 @@ const docTemplate = `{
                     },
                     {
                         "description": "CreateUserRequestBody",
-                        "name": "actor",
+                        "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.CreateUser"
+                            "$ref": "#/definitions/models.UpdateUserSwagger"
                         }
                     }
                 ],
@@ -820,7 +820,7 @@ const docTemplate = `{
         "models.Book": {
             "type": "object",
             "properties": {
-                "author_name": {
+                "author": {
                     "type": "string"
                 },
                 "book_id": {
@@ -829,14 +829,11 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
-                "date": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
                 "price": {
-                    "type": "integer"
+                    "type": "number"
+                },
+                "title": {
+                    "type": "string"
                 },
                 "updated_at": {
                     "type": "string"
@@ -846,27 +843,24 @@ const docTemplate = `{
         "models.CreateBook": {
             "type": "object",
             "properties": {
-                "author_name": {
-                    "type": "string"
-                },
-                "date": {
-                    "type": "string"
-                },
-                "name": {
+                "author": {
                     "type": "string"
                 },
                 "price": {
-                    "type": "integer"
+                    "type": "number"
+                },
+                "title": {
+                    "type": "string"
                 }
             }
         },
-        "models.CreateOrder": {
+        "models.CreateOrderSwagger": {
             "type": "object",
             "properties": {
-                "books_id": {
+                "book_id": {
                     "type": "string"
                 },
-                "users_id": {
+                "user_id": {
                     "type": "string"
                 }
             }
@@ -875,7 +869,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "balance": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "first_name": {
                     "type": "string"
@@ -917,7 +911,7 @@ const docTemplate = `{
                 "orders": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.OrderBook"
+                        "$ref": "#/definitions/models.OrderGroup"
                     }
                 }
             }
@@ -958,7 +952,7 @@ const docTemplate = `{
         "models.Order": {
             "type": "object",
             "properties": {
-                "books_id": {
+                "book_id": {
                     "type": "string"
                 },
                 "created_at": {
@@ -967,30 +961,81 @@ const docTemplate = `{
                 "order_id": {
                     "type": "string"
                 },
+                "payed": {
+                    "type": "number"
+                },
                 "updated_at": {
                     "type": "string"
                 },
-                "users_id": {
+                "user_id": {
                     "type": "string"
                 }
             }
         },
-        "models.OrderBook": {
+        "models.OrderGroup": {
             "type": "object",
             "properties": {
                 "created_at": {
                     "type": "string"
                 },
-                "full_name": {
+                "fullname": {
                     "type": "string"
                 },
-                "order_id": {
+                "payed": {
+                    "type": "number"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateBookSwagger": {
+            "type": "object",
+            "properties": {
+                "author": {
                     "type": "string"
                 },
                 "price": {
-                    "type": "integer"
+                    "type": "number"
                 },
-                "updated_at": {
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateOrderSwagger": {
+            "type": "object",
+            "properties": {
+                "book_id": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateUserSwagger": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "type": "number"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "login": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "phone_number": {
                     "type": "string"
                 }
             }
@@ -999,7 +1044,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "balance": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "created_at": {
                     "type": "string"

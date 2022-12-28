@@ -5,31 +5,31 @@ type BookPrimarKey struct {
 }
 
 type CreateBook struct {
-	Name       	string 	`json:"name"`
-	AuthorName 	string 	`json:"author_name"`
-	Price 		int64 	`json:"price"`
-	Date    	string  `json:"date"`
+	Title  string  `json:"title"`
+	Author string  `json:"author"`
+	Price  float64 `json:"price"`
 }
 type Book struct {
-	Id          string `json:"book_id"`
-	Name       	string `json:"name"`
-	AuthorName 	string `json:"author_name"`
-	Price 		int64  `json:"price"`
-	Date    	string `json:"date"`
-	CreatedAt   string `json:"created_at"`
-	UpdatedAt   string `json:"updated_at"`
+	Id        string  `json:"book_id"`
+	Title     string  `json:"title"`
+	Author    string  `json:"author"`
+	Price     float64 `json:"price"`
+	CreatedAt string  `json:"created_at"`
+	UpdatedAt string  `json:"updated_at"`
+}
+
+type UpdateBookSwagger struct {
+	Title  string  `json:"title"`
+	Author string  `json:"author"`
+	Price  float64 `json:"price"`
 }
 
 type UpdateBook struct {
-	Id          string `json:"book_id"` 
-	Name       	string `json:"name"`
-	AuthorName 	string `json:"author_name"`
-	Price 		int64  `json:"price"`
-	Date    	string  `json:"date"`
+	Id     string  `json:"book_id"`
+	Title  string  `json:"title"`
+	Author string  `json:"author"`
+	Price  float64 `json:"price"`
 }
-
-
-
 
 type GetListBookRequest struct {
 	Limit  int32

@@ -6,15 +6,15 @@ import (
 
 	"github.com/jackc/pgx/v4/pgxpool"
 
-	"github.com/jakhn/film_crud/config"
-	"github.com/jakhn/film_crud/storage"
+	"crud/config"
+	"crud/storage"
 )
 
 type Store struct {
 	db    *pgxpool.Pool
-	book  *bookRepo
-	order *orderRepo
-	user  *userRepo
+	book  *BookRepo
+	user  *UserRepo
+	order *OrderRepo
 }
 
 func NewPostgres(ctx context.Context, cfg config.Config) (storage.StorageI, error) {
@@ -40,8 +40,8 @@ func NewPostgres(ctx context.Context, cfg config.Config) (storage.StorageI, erro
 	return &Store{
 		db:    pool,
 		book:  NewBookRepo(pool),
-		order: NewOrderRepo(pool),
 		user:  NewUserRepo(pool),
+		order: NewOrderRepo(pool),
 	}, err
 }
 
@@ -58,15 +58,6 @@ func (s *Store) Book() storage.BookRepoI {
 	return s.book
 }
 
-func (s *Store) Order() storage.OrderRepoI {
-
-	if s.order == nil {
-		s.order = NewOrderRepo(s.db)
-	}
-
-	return s.order
-}
-
 func (s *Store) User() storage.UserRepoI {
 
 	if s.user == nil {
@@ -74,4 +65,13 @@ func (s *Store) User() storage.UserRepoI {
 	}
 
 	return s.user
+}
+
+func (s *Store) Order() storage.OrderRepoI {
+
+	if s.order == nil {
+		s.order = NewOrderRepo(s.db)
+	}
+
+	return s.order
 }

@@ -1,14 +1,15 @@
 package handler
 
 import (
-	"context"	
+	"context"
 	"errors"
 	"log"
 	"net/http"
 	"strconv"
 
+	"crud/models"
+
 	"github.com/gin-gonic/gin"
-	"github.com/jakhn/film_crud/models"
 )
 
 // CreateBook godoc
@@ -16,11 +17,11 @@ import (
 // @Router /book [POST]
 // @Summary Create Book
 // @Description Create Book
-// @Tags 	Book
+// @Tags Book
 // @Accept json
 // @Produce json
-// @Param book body models.CreateBook true "CreateBookRequestBody"
-// @Success 201 {object} models.Book "GetBookBody"
+// @Param book body models.CreateBook true "CreatebookRequestBody"
+// @Success 201 {object} models.Book "GetbookBody"
 // @Response 400 {object} string "Invalid Argument"
 // @Failure 500 {object} string "Server Error"
 func (h *HandlerV1) CreateBook(c *gin.Context) {
@@ -150,7 +151,7 @@ func (h *HandlerV1) GetBookList(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "id"
-// @Param book body models.CreateBook true "CreateBookRequestBody"
+// @Param book body models.UpdateBookSwagger true "CreateBookRequestBody"
 // @Success 200 {object} models.Book "GetBooksBody"
 // @Response 400 {object} string "Invalid Argument"
 // @Failure 500 {object} string "Server Error"
@@ -160,9 +161,9 @@ func (h *HandlerV1) UpdateBook(c *gin.Context) {
 		book models.UpdateBook
 	)
 
-	book.Id = c.Param("id")
+	id := c.Param("id")
 
-	if book.Id == "" {
+	if id == "" {
 		log.Printf("error whiling update: %v\n", errors.New("required book id").Error())
 		c.JSON(http.StatusBadRequest, errors.New("required book id").Error())
 		return
@@ -174,6 +175,8 @@ func (h *HandlerV1) UpdateBook(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
+
+	book.Id = id
 
 	rowsAffected, err := h.storage.Book().Update(
 		context.Background(),
@@ -194,7 +197,7 @@ func (h *HandlerV1) UpdateBook(c *gin.Context) {
 
 	resp, err := h.storage.Book().GetByPKey(
 		context.Background(),
-		&models.BookPrimarKey{Id: book.Id},
+		&models.BookPrimarKey{Id: id},
 	)
 
 	if err != nil {

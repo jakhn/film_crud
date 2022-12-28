@@ -2,9 +2,9 @@ package handler
 
 import (
 	"context"
-	"github.com/jakhn/film_crud/config"
-	"github.com/jakhn/film_crud/models"
-	"github.com/jakhn/film_crud/pkg/helper"
+	"crud/config"
+	"crud/models"
+	"crud/pkg/helper"
 	"errors"
 	"log"
 	"net/http"
@@ -12,19 +12,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// LoginAdmin godoc
-// @ID loginAdmin
-// @Router /loginadmin [POST]
-// @Summary Create LoginAdmin
-// @Description Create LoginAdmin
-// @Tags LoginAdmin
+// Login godoc
+// @ID login
+// @Router /login [POST]
+// @Summary Create Login
+// @Description Create Login
+// @Tags Login
 // @Accept json
 // @Produce json
-// @Param Login body models.Login true "LoginAdminRequestBody"
-// @Success 201 {object} models.LoginResponse "GetLoginAdminBody"
+// @Param Login body models.Login true "LoginRequestBody"
+// @Success 201 {object} models.LoginResponse "GetLoginBody"
 // @Response 400 {object} string "Invalid Argument"
 // @Failure 500 {object} string "Server Error"
-func (h *HandlerV1) LoginAdmin(c *gin.Context) {
+func (h *HandlerV1) Login(c *gin.Context) {
 	var login models.Login
 
 	err := c.ShouldBindJSON(&login)
@@ -54,7 +54,7 @@ func (h *HandlerV1) LoginAdmin(c *gin.Context) {
 		"user_id": resp.Id,
 	}
 
-	token, err := helper.GenerateJWT(data, config.SuperTimeExpiredAt, h.cfg.AuthSecretKey, h.cfg.SuperAdmin)
+	token, err := helper.GenerateJWT(data, config.TimeExpiredAt, h.cfg.AuthSecretKey, h.cfg.Client)
 	if err != nil {
 		log.Printf("error whiling GenerateJWT: %v\n", err)
 		c.JSON(http.StatusInternalServerError, errors.New("error whiling GenerateJWT").Error())
